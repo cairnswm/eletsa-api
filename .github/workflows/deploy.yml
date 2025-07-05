@@ -1,0 +1,50 @@
+name: Publish Project to Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate cairnsgamesconfig.php
+        working-directory: ./php/cairnsgames
+        run: |
+          echo "<?php" > cairnsgamesconfig.php
+          echo "" >> cairnsgamesconfig.php
+          echo "\$cairnsgamesconfig = array(" >> cairnsgamesconfig.php
+          echo "    \"server\" => '${{ vars.CG_MYSQL_HOSTNAME }}'," >> cairnsgamesconfig.php
+          echo "    \"username\" => '${{ vars.CG_MYSQL_USERNAME }}'," >> cairnsgamesconfig.php
+          echo "    \"password\" => '${{ secrets.CG_MYSQL_PASSWORD }}'," >> cairnsgamesconfig.php
+          echo "    \"database\" => '${{ vars.CG_MYSQL_DATABASE }}'" >> cairnsgamesconfig.php
+          echo ");" >> cairnsgamesconfig.php
+          echo "" >> cairnsgamesconfig.php
+          echo "?>" >> cairnsgamesconfig.php
+
+      - name: Generate babygo config.php
+        working-directory: ./php
+        run: |
+          echo "<?php" > eletsaconfig.php
+          echo "" >> eletsaconfig.php
+          echo "\$eletsaconfig = array(" >> eletsaconfig.php
+          echo "    \"server\" => '${{ vars.MYSQL_HOSTNAME }}'," >> eletsaconfig.php
+          echo "    \"username\" => '${{ vars.MYSQL_USERNAME }}'," >> eletsaconfig.php
+          echo "    \"password\" => '${{ secrets.MYSQL_PASSWORD }}'," >> eletsaconfig.php
+          echo "    \"database\" => '${{ vars.MYSQL_DATABASE }}'" >> eletsaconfig.php
+          echo ");" >> eletsaconfig.php
+          echo "" >> eletsaconfig.php
+          echo "?>" >> eletsaconfig.php
+
+      - name: Deploy PHP Folder
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ vars.FTP_SERVER }}
+          username: ${{ vars.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./php/
+          server-dir: ${{ vars.PHP_DIR }}

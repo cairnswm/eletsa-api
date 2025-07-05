@@ -1,0 +1,3 @@
+# Ignore configuration files
+php/cairnsgames/cairnsgamesconfig.php
+php/eletsaconfig.php
