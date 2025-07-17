@@ -1,4 +1,4 @@
-POST https://localhost/eletsa/php/cairnsgames/bulk.php
+POST https://localhost/eletsa-api/php/cairnsgames/bulk.php
 app_id: e671937d-54c9-11f0-9ec0-1a220d8ac2c9
 
 { "users": [1527, 1528, 1529]}

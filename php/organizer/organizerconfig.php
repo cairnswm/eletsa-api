@@ -3,7 +3,7 @@
 $organizersconfig = [
     "organizer" => [
         "tablename" => "organizers",
-        "key" => "id",
+        "key" => "user_id",
         "select" => [
             "id",
             "user_id",
