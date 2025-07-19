@@ -1,0 +1,12 @@
+POST  http://localhost/eletsa-api/php/cart/api.php/item
+
+{
+      "ticket_type_id": 10,
+      "user_id": 1527,
+      "event_id": 8,
+      "event_name": "Safari Test",
+      "ticket_name": "Special",
+      "price": 15,
+      "quantity": 1,
+      "total_price_per_item": 15
+    }

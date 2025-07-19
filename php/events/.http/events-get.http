@@ -1,1 +1,1 @@
-GET http://localhost/eletsa/php/events/api.php/user/1/events
+GET http://localhost/eletsa-api/php/events/api.php/event

@@ -16,45 +16,49 @@ if ($gapiconn->connect_error) {
  * @param string $sql The SQL query with placeholders
  * @param array $params The parameters to bind to the query
  * @return mysqli_stmt The executed statement object
- */
+ * */
 function executeSQL($sql, $params = []) {
     global $gapiconn;
-    
+
     $stmt = $gapiconn->prepare($sql);
-    
+
     if (!$stmt) {
         throw new Exception("Error preparing statement: " . $gapiconn->error);
     }
-    
+
     if (!empty($params)) {
-        // Determine the types of the parameters
         $types = '';
         foreach ($params as $param) {
             if (is_int($param)) {
-                $types .= 'i'; // Integer
+                $types .= 'i';
             } elseif (is_float($param)) {
-                $types .= 'd'; // Double
+                $types .= 'd';
             } elseif (is_string($param)) {
-                $types .= 's'; // String
+                $types .= 's';
             } else {
-                $types .= 'b'; // Blob and other types
+                $types .= 'b';
             }
         }
-        
-        // Create an array with references to the parameters
         $bindParams = array($types);
         foreach ($params as $key => $value) {
             $bindParams[] = &$params[$key];
         }
-        
-        // Bind the parameters to the statement
         call_user_func_array(array($stmt, 'bind_param'), $bindParams);
     }
-    
-    // Execute the statement
+
     if (!$stmt->execute()) {
+        $stmt->close();
         throw new Exception("Error executing statement: " . $stmt->error);
     }
-    
-    return $stmt;
+
+    $result = $stmt->get_result();
+    $rows = [];
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        $result->free();
+    }
+    $stmt->close();
+    return $rows;
 }
