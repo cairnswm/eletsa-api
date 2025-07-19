@@ -1,0 +1,5 @@
+PUT  http://eletsa.cairns.co.za/php/cart/api.php/item/6
+
+{
+      "quantity": 22
+    }

@@ -37,6 +37,7 @@ function getCart($config) {
     $items = [];
     $sql = "
         SELECT
+            ci.id as cart_item_id,
             ci.ticket_type_id AS ticket_id,
             tt.event_id,
             e.title AS event_name,

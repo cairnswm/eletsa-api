@@ -1,4 +1,4 @@
-POST  http://eletsa.cairns.co.za/php/cart/api.php/item
+DELETE  http://eletsa.cairns.co.za/php/cart/api.php/item/7
 
 {
       "ticket_type_id": 10,

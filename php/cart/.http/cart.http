@@ -1,2 +1,2 @@
-GET http://localhost/eletsa-api/php/cart/api.php/user/1527/cart
+GET http://eletsa.cairns.co.za/php/cart/api.php/user/1527/cart
 
