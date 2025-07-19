@@ -69,3 +69,51 @@ function getCart($config) {
         'cart_total' => $cart_total
     ];
 }
+
+
+function cartToOrder() {
+    global $user;
+
+    if (!isset($user)) {
+        http_response_code(401);
+        return ["error" => true, "message" => "Unauthorized"];
+    }
+
+    $userId = $user->id;
+
+    // Fetch cart items for the user
+    $cartItemsSql = "SELECT ticket_type_id, quantity, price FROM cart_items WHERE user_id = ?";
+    $cartItems = executeSQL($cartItemsSql, [$userId]);
+
+    if (empty($cartItems)) {
+        return ["error" => true, "message" => "Cart is empty"];
+    }
+
+    // Calculate total and final amounts
+    $totalAmount = 0;
+    foreach ($cartItems as $item) {
+        $totalAmount += $item["quantity"] * $item["price"];
+    }
+    $finalAmount = $totalAmount; // Apply any discounts or adjustments here if needed
+
+    // Create a new order
+    $createOrderSql = "INSERT INTO orders (user_id, total_amount, final_amount, created_at, modified_at) VALUES (?, ?, ?, NOW(), NOW())";
+    executeSQL($createOrderSql, [$userId, $totalAmount, $finalAmount]);
+
+    // Get the newly created order ID
+    $orderIdSql = "SELECT LAST_INSERT_ID() AS order_id";
+    $orderIdResult = executeSQL($orderIdSql);
+    $orderId = $orderIdResult[0]["order_id"];
+
+    // Create order items from cart items
+    foreach ($cartItems as $item) {
+        $createOrderItemSql = "INSERT INTO order_items (order_id, ticket_type_id, quantity, price, created_at, modified_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        executeSQL($createOrderItemSql, [$orderId, $item["ticket_type_id"], $item["quantity"], $item["price"]]);
+    }
+
+    // Clear the user's cart
+    $clearCartSql = "DELETE FROM cart_items WHERE user_id = ?";
+    executeSQL($clearCartSql, [$userId]);
+
+    return ["success" => true, "message" => "Order created successfully", "order_id" => $orderId];
+}

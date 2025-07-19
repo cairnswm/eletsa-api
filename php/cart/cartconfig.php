@@ -109,5 +109,6 @@ $cartconfig = [
     ],
     "post" => [
         // Special POST endpoints can go here
+        "carttoorder" => "cartToOrder"
     ]
 ];

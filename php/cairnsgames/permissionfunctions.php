@@ -53,7 +53,6 @@ function hasAccess($id, $permission)
 
 function getSecret($secretname, $default)
 {
-
     global $debugValues;
     $appid = getAppId();
     if ($appid == null) {
@@ -63,7 +62,6 @@ function getSecret($secretname, $default)
     $params = [$appid, $secretname];
     $sss = "ss";
     $result = PrepareExecSQL($sql, $sss, $params);
-    
     if (empty($result)) {
         return $default;
     }
@@ -98,9 +96,9 @@ function getProperty($name, $default)
 function getUserFromToken($token)
 {
     if (validateJwt($token)) {
-
         $data = get_jwt_payload($token)->data;
         return $data;
     }
+    echo "Invalid token";
     return null;
 }

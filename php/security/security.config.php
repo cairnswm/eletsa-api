@@ -6,8 +6,6 @@ $issuer = getSecret("jwt_issuer", "cairnsgames.co.za");
 $subject = getSecret("jwt_subject", "cairnsgames token");
 $audience = getSecret("jwt_audience", "cairnsgames client");
 
-
-
 $defaultConfig = array("issuer"=>$issuer,"subject"=>$subject,"audience"=>$audience);
 
 $JWTSECRET = getSecret("SECURE_SECRET","cairnsgameSUPERsecretPASSWORD");
