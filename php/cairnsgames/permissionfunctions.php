@@ -99,6 +99,5 @@ function getUserFromToken($token)
         $data = get_jwt_payload($token)->data;
         return $data;
     }
-    echo "Invalid token";
     return null;
 }
