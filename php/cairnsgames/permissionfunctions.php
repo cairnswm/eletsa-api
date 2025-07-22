@@ -51,46 +51,98 @@ function hasAccess($id, $permission)
     return false;
 }
 
-function getSecret($secretname, $default)
+function getSecret($secretname, $default, $domain = null)
 {
     global $debugValues;
     $appid = getAppId();
     if ($appid == null) {
         return null;
     }
-    $sql = "SELECT value FROM application_secret WHERE app_id = ? and name = ?";
-    $params = [$appid, $secretname];
-    $sss = "ss";
-    $result = PrepareExecSQL($sql, $sss, $params);
-    if (empty($result)) {
+    if ($domain !== null) {
+        $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND domain = ?";
+        $params = [$appid, $secretname, $domain];
+        $sss = "sss";
+        $result = PrepareExecSQL($sql, $sss, $params);
+        if (!empty($result)) {
+            return $result[0]["value"];
+        }
+        // fallback to no domain
+        $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND (domain IS NULL OR domain = '')";
+        $params = [$appid, $secretname];
+        $sss = "ss";
+        $result = PrepareExecSQL($sql, $sss, $params);
+        if (!empty($result)) {
+            return $result[0]["value"];
+        }
+        return $default;
+    } else {
+        $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND (domain IS NULL OR domain = '')";
+        $params = [$appid, $secretname];
+        $sss = "ss";
+        $result = PrepareExecSQL($sql, $sss, $params);
+        if (!empty($result)) {
+            return $result[0]["value"];
+        }
         return $default;
     }
-
-    return $result[0]["value"];
 }
 
 $app_properties = array();
 
-function getProperty($name, $default)
+function getProperty($name, $default, $domain = null)
 {
     global $debugValues, $app_properties;
     $appid = getAppId();
     if ($appid == null) {
         return null;
     }
-    if (empty($app_properties)) {
-        $sql = "SELECT name, value FROM application_property WHERE app_id = ?";
+    if ($domain !== null) {
+        $sql = "SELECT name, value FROM application_property WHERE app_id = ? AND domain = ?";
+        $params = [$appid, $domain];
+        $sss = "ss";
+        $result = PrepareExecSQL($sql, $sss, $params);
+        foreach ($result as $r) {
+            $app_properties[$r["name"] . "|" . $domain] = $r["value"];
+        }
+        if (isset($app_properties[$name . "|" . $domain])) {
+            return $app_properties[$name . "|" . $domain];
+        }
+        // fallback to no domain
+        $sql = "SELECT name, value FROM application_property WHERE app_id = ? AND (domain IS NULL OR domain = '')";
         $params = [$appid];
         $sss = "s";
         $result = PrepareExecSQL($sql, $sss, $params);
         foreach ($result as $r) {
             $app_properties[$r["name"]] = $r["value"];
         }
+        if (isset($app_properties[$name])) {
+            return $app_properties[$name];
+        }
+        return $default;
+    } else {
+        if (empty($app_properties)) {
+            $sql = "SELECT name, value FROM application_property WHERE app_id = ? AND (domain IS NULL OR domain = '')";
+            $params = [$appid];
+            $sss = "s";
+            $result = PrepareExecSQL($sql, $sss, $params);
+            foreach ($result as $r) {
+                $app_properties[$r["name"]] = $r["value"];
+            }
+        }
+        if (isset($app_properties[$name])) {
+            return $app_properties[$name];
+        }
+        return $default;
     }
-    if (isset($app_properties[$name])) {
-        return $app_properties[$name];
+}
+
+function getSecretOrProperty($name, $default, $domain = null)
+{
+    $secret = getSecret($name, null);
+    if ($secret !== null) {
+        return $secret;
     }
-    return $default;
+    return getProperty($name, $default);
 }
 
 function getUserFromToken($token)
