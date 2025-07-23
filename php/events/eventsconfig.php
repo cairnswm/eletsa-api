@@ -138,7 +138,8 @@ $eventsconfig = [
                     "user_id",
                     "event_id",
                     "rating",
-                    "review"
+                    "review", 
+                    "created_at"
                 ]
             ]
         ],
