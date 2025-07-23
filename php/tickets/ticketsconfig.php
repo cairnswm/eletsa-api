@@ -1,6 +1,12 @@
 <?php
 
 $ticketsconfig = [
+    "review" => [
+        "tablename" => "reviews",
+        "key" => "id",
+        "select" => ["id", "user_id", "event_id", "rating", "review"],
+        "create" => ["user_id", "event_id", "rating", "review"]
+    ],
     "post" => [
         "tickets" => "getTickets"
     ]

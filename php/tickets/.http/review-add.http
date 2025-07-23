@@ -1,0 +1,8 @@
+POST http://eletsa.cairns.co.za/php/tickets/api.php/review
+
+{
+  "user_id": 1527,
+  "event_id": 1,
+  "rating": 5,
+  "review": "Great event!"
+}
