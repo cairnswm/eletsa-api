@@ -46,6 +46,10 @@ function createTickets($orderId)
       $item['ticket_type_id'],
       $ticketCode
     ]);
+
+    // Update quantity_sold in ticket_types table
+    $updateTicketTypeSql = "UPDATE ticket_types SET quantity_sold = quantity_sold + ? WHERE id = ?";
+    executeQuery($updateTicketTypeSql, [$item['quantity'], $item['ticket_type_id']]);
   }
 
   executeQuery("UPDATE order_items SET purchase_datetime = NOW() WHERE order_id = ?", [$orderId]);

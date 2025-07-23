@@ -20,10 +20,13 @@ function getTickets($config)
     t.quantity,
     t.ticket_code,
     t.assigned_at,
-    t.used
+    t.used,
+    r.rating,
+    r.review
 FROM tickets t
 JOIN events e ON t.event_id = e.id
 JOIN ticket_types tt ON t.ticket_type_id = tt.id
+LEFT JOIN reviews r ON r.event_id = e.id AND r.user_id = t.user_id
 WHERE t.user_id = ?
 ORDER BY e.start_datetime ASC;
 ";
