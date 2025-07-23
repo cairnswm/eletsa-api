@@ -1,2 +1,2 @@
-GET http://localhost/eletsa-api/php/payment/initiate.php?order_id=3 HTTP/1.1
+GET http://localhost/eletsa-api/php/payment/initiate.php?order_id=10 HTTP/1.1
 app_id: e671937d-54c9-11f0-9ec0-1a220d8ac2c9

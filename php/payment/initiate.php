@@ -132,9 +132,10 @@ $result = executeCurlRequest('https://secure.paygate.co.za/payweb3/initiate.tran
 $log[]=  "RESPONSE: ". $result;
 
 
+
 $log[] = "Payweb Response:" . json_encode($result);
 
-PrepareExecSQL("insert into zz_data (script, input, data) values (?,?,?)", "sss", array('initiate.php', json_encode($data), json_encode($result)));
+executeQuery("INSERT INTO payment_logs (status_code, request_payload, response_body) VALUES (?, ?, ?)", ['initiate.php', json_encode($data), json_encode($result)]);
 
 // Process the response
 parse_str($result, $response); // Parse the query string response
