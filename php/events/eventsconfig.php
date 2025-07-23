@@ -1,7 +1,7 @@
 <?php
 
 $eventsconfig = [
-  "user" => [
+    "user" => [
         "tablename" => "users",
         "key" => "id",
         "select" => [
@@ -128,6 +128,17 @@ $eventsconfig = [
                     "is_visible",
                     "created_at",
                     "modified_at"
+                ]
+            ],
+            "reviews" => [
+                "tablename" => "reviews",
+                "key" => "event_id",
+                "select" => [
+                    "id",
+                    "user_id",
+                    "event_id",
+                    "rating",
+                    "review"
                 ]
             ]
         ],
