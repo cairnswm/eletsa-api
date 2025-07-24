@@ -18,6 +18,7 @@ function getTickets($config)
     $sql = "SELECT
     e.title AS event_title,
     e.start_datetime,
+    e.end_datetime,
     e.location_name,
     e.location_latitude,
     e.location_longitude,
