@@ -113,7 +113,7 @@ $data = array(
     'LOCALE' => 'en-za',
     'COUNTRY' => 'ZAF',
     'EMAIL' => 'customer@paygate.co.za',
-    'NOTIFY_URL' => 'https://cairnsgames.co.za/php/payweb3/notify.php',
+    'NOTIFY_URL' => $notifyURL,
 );
 
 $log[] = "Payment Data: " . json_encode($data);

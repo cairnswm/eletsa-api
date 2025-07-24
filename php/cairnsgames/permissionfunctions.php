@@ -51,10 +51,9 @@ function hasAccess($id, $permission)
     return false;
 }
 
-function getSecret($secretname, $default, $domain = null)
+function getSecretWithAppId($appid, $secretname, $default, $domain = null)
 {
     global $debugValues;
-    $appid = getAppId();
     if ($appid == null) {
         return null;
     }
@@ -85,6 +84,42 @@ function getSecret($secretname, $default, $domain = null)
         }
         return $default;
     }
+}
+function getSecret($secretname, $default, $domain = null)
+{
+    global $debugValues;
+    $appid = getAppId();
+    return getSecretWithAppId($appid, $secretname, $default, $domain);
+    // if ($appid == null) {
+    //     return null;
+    // }
+    // if ($domain !== null) {
+    //     $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND domain = ?";
+    //     $params = [$appid, $secretname, $domain];
+    //     $sss = "sss";
+    //     $result = PrepareExecSQL($sql, $sss, $params);
+    //     if (!empty($result)) {
+    //         return $result[0]["value"];
+    //     }
+    //     // fallback to no domain
+    //     $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND (domain IS NULL OR domain = '')";
+    //     $params = [$appid, $secretname];
+    //     $sss = "ss";
+    //     $result = PrepareExecSQL($sql, $sss, $params);
+    //     if (!empty($result)) {
+    //         return $result[0]["value"];
+    //     }
+    //     return $default;
+    // } else {
+    //     $sql = "SELECT value FROM application_secret WHERE app_id = ? AND name = ? AND (domain IS NULL OR domain = '')";
+    //     $params = [$appid, $secretname];
+    //     $sss = "ss";
+    //     $result = PrepareExecSQL($sql, $sss, $params);
+    //     if (!empty($result)) {
+    //         return $result[0]["value"];
+    //     }
+    //     return $default;
+    // }
 }
 
 $app_properties = array();

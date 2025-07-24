@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/transactions.php';
+include_once __DIR__ . '/../cairnsgames/email.php';
 
 function updateOrderStatus($orderId, $status)
 {
@@ -17,7 +18,7 @@ function createTickets($orderId)
     throw new Exception("Order not found.");
   }
 
-  $orderItems = executeQuery("SELECT oi.id, oi.order_id, oi.ticket_type_id, oi.quantity, oi.price, tt.event_id 
+  $orderItems = executeQuery("SELECT tt.name, oi.id, oi.order_id, oi.ticket_type_id, oi.quantity, oi.price, tt.event_id
     FROM order_items oi, ticket_types tt 
     WHERE oi.ticket_type_id = tt.id 
     AND order_id = ?", [$orderId]);
@@ -46,6 +47,38 @@ function createTickets($orderId)
       $item['ticket_type_id'],
       $ticketCode
     ]);
+    $event = executeQuery("SELECT * FROM events WHERE id = ?", [$item['event_id']]);
+    $event = $event[0] ?? null;
+
+    $eventData = [
+      "name" => $event['title'] ?? '',
+      "date" => $event['start_datetime'] ?? '',
+      "location" => $event['location'] ?? ''
+    ];
+
+    $ticketsData = [
+      [
+        "type" => $item["name"],
+        "price" => $item['price'],
+        "quantity" => $item['quantity']
+      ]
+    ];
+
+    $emailData = [
+      "event" => $eventData,
+      "tickets" => $ticketsData
+    ];
+
+    // var_dump("EMAIL DATA", $emailData);
+
+    sendEmailByTemplate($order['user_id'], 'thank_you_for_buying_tickets', $emailData);
+
+    $organizerEmailData = [
+      "event" => $eventData,
+      "tickets" => $ticketsData
+    ];
+
+    sendEmailByTemplate($event["organizer_id"], 'someone_bought_tickets', $organizerEmailData);
 
     // Update quantity_sold in ticket_types table
     $updateTicketTypeSql = "UPDATE ticket_types SET quantity_sold = quantity_sold + ? WHERE id = ?";
@@ -77,6 +110,4 @@ function processOrderPayment($orderId)
   updateOrderStatus($orderId, 'paid');
   createTickets($orderId);
   createTransactions($order);
-
-
 }
