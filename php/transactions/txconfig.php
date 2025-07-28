@@ -16,6 +16,8 @@ function getTransactions($config)
     ti.quantity,
     t.amount,
     t.payout_amount,
+    t.cost_amount,
+    t.balance,
     t.id AS transaction_id,
     t.user_id,
     t.order_id,

@@ -12,8 +12,18 @@ function createTransactions($order)
 
   // Create a transaction for each order item
   foreach ($orderItems as $item) {
-    $transactionSql = "INSERT INTO transactions (user_id, order_id, order_item_id, ticket_id, organizer_id, transaction_type, currency, amount, payout_amount, transaction_date, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+    // Fetch the balance of the previous transaction
+    $previousBalanceSql = "SELECT balance FROM transactions WHERE organizer_id = ? ORDER BY created_at DESC LIMIT 1";
+    $previousBalanceResult = executeQuery($previousBalanceSql, [$item['organizer_id']]);
+    $previousBalance = $previousBalanceResult ? $previousBalanceResult[0]['balance'] : 0;
+
+    // Calculate the new balance
+    $payoutAmount = $item['price'] * 0.85;
+    $newBalance = $previousBalance + $payoutAmount;
+
+    // Insert the new transaction
+    $transactionSql = "INSERT INTO transactions (user_id, order_id, order_item_id, ticket_id, organizer_id, transaction_type, currency, amount, payout_amount, cost_amount, balance, transaction_date, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     executeQuery($transactionSql, [
       $order['user_id'],
       $order['id'],
@@ -23,7 +33,9 @@ function createTransactions($order)
       'ticket_purchase',
       'ZAR',
       $item['price'],
-      $item['price'] * 0.85
+      $payoutAmount,
+      $item['price'] * 0.15,
+      $newBalance
     ]);
   }
 }
