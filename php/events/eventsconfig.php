@@ -44,26 +44,27 @@ $eventsconfig = [
     "event" => [
         "tablename" => "events",
         "key" => "id",
-        "select" => [
-            "id",
-            "organizer_id",
-            "title",
-            "description",
-            "category",
-            "tags",
-            "location_name",
-            "location_latitude",
-            "location_longitude",
-            "start_datetime",
-            "end_datetime",
-            "max_attendees",
-            "status",
-            "images",
-            "videos",
-            "popularity_score",
-            "created_at",
-            "modified_at"
-        ],
+        "select" => "getEvents",
+        // [
+        //     "id",
+        //     "organizer_id",
+        //     "title",
+        //     "description",
+        //     "category",
+        //     "tags",
+        //     "location_name",
+        //     "location_latitude",
+        //     "location_longitude",
+        //     "start_datetime",
+        //     "end_datetime",
+        //     "max_attendees",
+        //     "status",
+        //     "images",
+        //     "videos",
+        //     "popularity_score",
+        //     "created_at",
+        //     "modified_at"
+        // ],
         "create" => [
             "organizer_id",
             "title",
@@ -209,3 +210,21 @@ $eventsconfig = [
         // Special POST endpoints can go here
     ]
 ];
+
+
+function getEvents() {
+    $sql = "SELECT 
+  e.*,
+  AVG(r.rating) AS popularity_score
+FROM 
+  events e
+JOIN 
+  organizers o ON e.organizer_id = o.user_id
+LEFT JOIN 
+  reviews r ON r.user_id = o.user_id
+GROUP BY 
+  e.id;";
+
+  $result = executeSQL($sql);   
+  return $result;
+}
