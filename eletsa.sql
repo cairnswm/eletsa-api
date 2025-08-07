@@ -415,6 +415,88 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   KEY `transaction_date` (`transaction_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+-- Dumping structure for table cairnsco_eletsa.activity_comments
+CREATE TABLE IF NOT EXISTS `activity_comments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `parent_comment_id` int(11) DEFAULT NULL,
+  `likes` int(11) NOT NULL DEFAULT 0,
+  `is_moderated` tinyint(1) NOT NULL DEFAULT 0,
+  `is_visible` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `modified_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `activity_id` (`activity_id`),
+  KEY `user_id` (`user_id`),
+  KEY `parent_comment_id` (`parent_comment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table cairnsco_eletsa.activity_comment_reactions
+CREATE TABLE IF NOT EXISTS `activity_comment_reactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `comment_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `reaction_type` enum('like','love','laugh','wow','sad','angry') NOT NULL DEFAULT 'like',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_comment_reaction` (`comment_id`,`user_id`),
+  KEY `comment_id` (`comment_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table cairnsco_eletsa.activity_reactions
+CREATE TABLE IF NOT EXISTS `activity_reactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `reaction_type` enum('like','love','laugh','wow','sad','angry') NOT NULL DEFAULT 'like',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_reaction` (`activity_id`,`user_id`),
+  KEY `activity_id` (`activity_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table cairnsco_eletsa.activity_templates
+CREATE TABLE IF NOT EXISTS `activity_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity_type` enum('event_created','event_reviewed','user_followed','ticket_purchased','achievement_unlocked') NOT NULL,
+  `language_code` varchar(10) NOT NULL DEFAULT 'en',
+  `template` text NOT NULL,
+  `example` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `modified_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `type_language` (`activity_type`,`language_code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table cairnsco_eletsa.user_activity_feed
+CREATE TABLE IF NOT EXISTS `user_activity_feed` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `activity_type` enum('event_created','event_reviewed','user_followed','ticket_purchased','achievement_unlocked') NOT NULL,
+  `reference_id_1` int(11) DEFAULT NULL,
+  `reference_id_2` int(11) DEFAULT NULL,
+  `metadata` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `template_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `activity_type` (`activity_type`),
+  KEY `created_at` (`created_at`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 -- Data exporting was unselected.
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

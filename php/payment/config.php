@@ -16,54 +16,75 @@ $encryptionKey = 'secret';
 function executeQuery($sql, $params = []) {
     global $pwhost, $pwuser, $pwpassword, $pwdatabase;
 
-    // Create connection
     $conn = new mysqli($pwhost, $pwuser, $pwpassword, $pwdatabase);
 
-    // Check connection
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // echo "Number of params", count($params), "<br/>";
-    // Prepare statement
     $stmt = $conn->prepare($sql);
     if ($params) {
-        // Bind parameters
         $stmt->bind_param(str_repeat('s', count($params)), ...$params);
     }
 
-    // Execute the statement
     $stmt->execute();
 
-    // Get results for SELECT statements
-    if (strpos($sql, 'SELECT') === 0) {
-        // Alternative approach without using get_result() (which requires mysqlnd)
+    if (stripos($sql, 'SELECT') === 0) {
         $meta = $stmt->result_metadata();
-        $fields = array();
-        $parameters = array();
-        
+        $fields = [];
+        $parameters = [];
         while ($field = $meta->fetch_field()) {
             $parameters[] = &$row[$field->name];
             $fields[] = $field->name;
         }
-        
-        call_user_func_array(array($stmt, 'bind_result'), $parameters);
-        
-        $data = array();
+        call_user_func_array([$stmt, 'bind_result'], $parameters);
+        $data = [];
         while ($stmt->fetch()) {
-            $rowData = array();
+            $rowData = [];
             foreach ($row as $key => $val) {
                 $rowData[$key] = $val;
             }
             $data[] = $rowData;
         }
-        
         $stmt->close();
         $conn->close();
         return $data;
     }
 
-    // Close the statement and connection
+    if (stripos($sql, 'INSERT') === 0) {
+        $insertId = $conn->insert_id;
+        $table = '';
+        if (preg_match('/INSERT\s+INTO\s+`?([a-zA-Z0-9_]+)`?/i', $sql, $matches)) {
+            $table = $matches[1];
+        }
+        if ($table && $insertId) {
+            $stmt->close();
+            $selectSql = "SELECT * FROM `$table` WHERE id = ?";
+            $stmt2 = $conn->prepare($selectSql);
+            $stmt2->bind_param('i', $insertId);
+            $stmt2->execute();
+            $meta = $stmt2->result_metadata();
+            $fields = [];
+            $parameters = [];
+            while ($field = $meta->fetch_field()) {
+                $parameters[] = &$row[$field->name];
+                $fields[] = $field->name;
+            }
+            call_user_func_array([$stmt2, 'bind_result'], $parameters);
+            $data = [];
+            while ($stmt2->fetch()) {
+                $rowData = [];
+                foreach ($row as $key => $val) {
+                    $rowData[$key] = $val;
+                }
+                $data[] = $rowData;
+            }
+            $stmt2->close();
+            $conn->close();
+            return $data ? $data[0] : null;
+        }
+    }
+
     $stmt->close();
     $conn->close();
 }

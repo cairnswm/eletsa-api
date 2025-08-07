@@ -17,7 +17,7 @@ if ($gapiconn->connect_error) {
  * @param array $params The parameters to bind to the query
  * @return mysqli_stmt The executed statement object
  * */
-function executeSQL($sql, $params = []) {
+function executeSQL($sql, $params = [], $json = []) {
     global $gapiconn;
 
     $stmt = $gapiconn->prepare($sql);
@@ -55,6 +55,14 @@ function executeSQL($sql, $params = []) {
     $rows = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
+            foreach ($json as $field) {
+                if (isset($row[$field])) {
+                    $decoded = json_decode($row[$field], true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $row[$field] = $decoded;
+                    }
+                }
+            }
             $rows[] = $row;
         }
         $result->free();

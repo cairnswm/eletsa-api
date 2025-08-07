@@ -1,0 +1,2 @@
+GET http://localhost/eletsa-api/php/activity/boltnew.php
+Accept: application/json

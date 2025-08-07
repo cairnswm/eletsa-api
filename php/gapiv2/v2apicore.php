@@ -6,6 +6,7 @@ include_once dirname(__FILE__) . "/get.php";
 include_once dirname(__FILE__) . "/generateopenapi.php";
 include_once dirname(__FILE__) . "/gapifunctions.php";
 
+
 function runAPI($configs)
 {
     try {
@@ -22,7 +23,7 @@ function runAPI($configs)
         if ($endpoint === '$$') {
             if ($method === 'GET') {
                 header('Content-Type: application/json');
-                echo json_encode(getConfig($configs));
+                echo json_encode(utf8ize(getConfig($configs)));
             } else {
                 http_response_code(405);
                 echo json_encode(["error" => "Method not allowed"]);
@@ -60,7 +61,7 @@ function runAPI($configs)
                         // Call the function with the data
                         $response = $functionName($data);
                         header('Content-Type: application/json');
-                        echo json_encode($response);
+                        echo json_encode(utf8ize($response), JSON_UNESCAPED_UNICODE);
                         exit;
                     }
                 }
@@ -161,7 +162,7 @@ function runAPI($configs)
         }
 
         header('Content-Type: application/json');
-        $json = json_encode($response, JSON_UNESCAPED_UNICODE);
+        $json = json_encode(utf8ize($response), JSON_UNESCAPED_UNICODE);
         if ($json === false) {
             echo json_encode(['error' => json_last_error_msg()]);
             exit;

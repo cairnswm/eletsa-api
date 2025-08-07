@@ -1,7 +1,7 @@
 <?php
 
 
-include_once "./eletsaconfig.php";
+include_once __DIR__ . "/eletsaconfig.php";
 global $conn;
 
 function getConnection() {
@@ -36,12 +36,14 @@ function executeSQL($sql, $params = [], $json = []) {
         throw new Exception("Query execution failed: " . $stmt->error);
     }
 
-    // Check if this is a SELECT statement
-    if (stripos(trim($sql), 'select') === 0) {
+    var_dump($json);
+    $trimmedSql = ltrim($sql);
+    if (stripos($trimmedSql, 'select') === 0) {
         $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) {
             foreach ($json as $field) {
+                echo "Processing field: $field\n";
                 if (isset($row[$field])) {
                     $decoded = json_decode($row[$field], true);
                     if (json_last_error() === JSON_ERROR_NONE) {
@@ -57,6 +59,12 @@ function executeSQL($sql, $params = [], $json = []) {
         return $rows;
     }
 
-    return $stmt;
-}
+    if (stripos($trimmedSql, 'insert') === 0) {
+        $insertId = $stmt->insert_id;
+        $stmt->close();
+        return $insertId;
+    }
 
+    $stmt->close();
+    return true;
+}

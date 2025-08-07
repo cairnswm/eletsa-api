@@ -1,0 +1,2 @@
+GET http://localhost/eletsa-api/php/activity/api.php/user/1527/wall
+Accept: application/json
