@@ -1,2 +1,2 @@
-GET http://localhost/eletsa-api/php/activity/api.php/user/1527/wall
+GET http://eletsa.cairns.co.za/php/activity/api.php/user/1527/wall
 Accept: application/json
