@@ -31,6 +31,6 @@ LEFT JOIN events e ON ti.event_id = e.id
 WHERE t.organizer_id = ?
 ORDER BY t.transaction_date DESC;
 ";
-    $result = executeSQL($sql, [$userid]);
+    $result = gapiExecuteSQL($sql, [$userid]);
     return $result;
 }

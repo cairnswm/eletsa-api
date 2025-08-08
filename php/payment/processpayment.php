@@ -72,6 +72,11 @@ function createTickets($orderId)
     ];
 
     // var_dump("EMAIL DATA", $emailData);
+    insertActivityTicketPurchased(
+      $order['user_id'],
+      $item['event_id'],
+      $item['ticket_id']
+    );
 
     sendEmailByTemplate($order['user_id'], 'thank_you_for_buying_tickets', $emailData);
 

@@ -1,0 +1,8 @@
+POST http://localhost/eletsa-api/php/activity/api.php/activityReaction
+Accept: application/json
+
+{
+  "activity_id": 35,
+  "reaction": "like",
+  "user_id": 1530
+}

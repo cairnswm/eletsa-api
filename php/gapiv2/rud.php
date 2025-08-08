@@ -79,9 +79,8 @@ function CreateData($config, $data)
 
     // Execute after create function if it exists
     if (isset($config['aftercreate']) && function_exists($config['aftercreate'])) {
-        var_dump($data);
         $res = call_user_func($config['aftercreate'], $config, $data, $new_record);
-        if (is_array($res)) {
+        if (is_array($res) && count($res) > 2) {
             $new_record = $res[2];
         }
     }

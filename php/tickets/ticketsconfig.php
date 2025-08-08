@@ -1,11 +1,14 @@
 <?php
 
+include_once __DIR__ . "/../activity/activity_functions.php";
+
 $ticketsconfig = [
     "review" => [
         "tablename" => "reviews",
         "key" => "id",
         "select" => ["id", "user_id", "event_id", "rating", "review"],
-        "create" => ["user_id", "event_id", "rating", "review"]
+        "create" => ["user_id", "event_id", "rating", "review"],
+        "aftercreate" => "afterCreateReview"
     ],
     "post" => [
         "tickets" => "getTickets"
@@ -37,6 +40,17 @@ LEFT JOIN reviews r ON r.event_id = e.id AND r.user_id = t.user_id
 WHERE t.user_id = ?
 ORDER BY e.start_datetime ASC;
 ";
-  $result = executeSQL($sql, [$userid]);
+  $result = gapiExecuteSQL($sql, [$userid]);
   return $result;
+}
+
+function afterCreateReview($config, $data, $new_record)
+{
+    $record = $new_record[0];
+    // Insert into user activity feed
+    insertUserActivityFeed($record['user_id'], 'event_reviewed', $record['event_id'], $record['id'], [
+        'rating' => $record['rating'],
+        'review' => $record['review']
+    ]);
+    return [$config, $data];
 }

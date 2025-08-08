@@ -36,14 +36,12 @@ function executeSQL($sql, $params = [], $json = []) {
         throw new Exception("Query execution failed: " . $stmt->error);
     }
 
-    var_dump($json);
     $trimmedSql = ltrim($sql);
     if (stripos($trimmedSql, 'select') === 0) {
         $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) {
             foreach ($json as $field) {
-                echo "Processing field: $field\n";
                 if (isset($row[$field])) {
                     $decoded = json_decode($row[$field], true);
                     if (json_last_error() === JSON_ERROR_NONE) {

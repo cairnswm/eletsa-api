@@ -1,5 +1,6 @@
 <?php
 include_once __DIR__ . "/../corsheaders.php";
+include_once __DIR__ . "/../dbconnection.php";
 
 function insertActivityComment($activityId, $userId, $content, $parentCommentId = null)
 {
@@ -47,10 +48,14 @@ function insertUserActivityFeed($userId, $activityType, $referenceId1 = null, $r
     $templateId = getActivityTemplateId($activityType, 'en');
   }
 
+  if (is_array($metadata)) {
+    $metadata = json_encode($metadata);
+  }
+
   $sql = "INSERT INTO user_activity_feed (user_id, activity_type, reference_id_1, reference_id_2, metadata, template_id) VALUES (?, ?, ?, ?, ?, ?)";
   $params = [$userId, $activityType, $referenceId1, $referenceId2, $metadata, $templateId];
-  $stmt = executeSQL($sql, $params);
-  return $stmt->insert_id;
+  $new = executeSQL($sql, $params);
+  return $new;
 }
 
 /*
@@ -72,35 +77,36 @@ achievement_unlocked	achievement_id (from achievements) NULL
 
 function insertActivityEventCreated($userId, $eventId, $metadata = null)
 {
-  return insertUserActivityFeed($userId, 'event_created', $eventId, null, $metadata, $templateId);
+  return insertUserActivityFeed($userId, 'event_created', $eventId, null, $metadata);
 }
 
 function insertActivityEventReviewed($userId, $eventId, $reviewId, $metadata = null)
 {
-  return insertUserActivityFeed($userId, 'event_reviewed', $eventId, $reviewId, $metadata, $templateId);
+  return insertUserActivityFeed($userId, 'event_reviewed', $eventId, $reviewId, $metadata);
 }
 
 function insertActivityUserFollowed($userId, $followedUserId, $metadata = null)
 {
-  return insertUserActivityFeed($userId, 'user_followed', $followedUserId, null, $metadata, $templateId);
+  return insertUserActivityFeed($userId, 'user_followed', $followedUserId, null, $metadata);
 }
 
-function insertActivityTicketPurchased($userId, $eventId, $ticketTypeId, $metadata = null)
+function insertActivityTicketPurchased($userId, $eventId, $ticketId, $metadata = null)
 {
-  return insertUserActivityFeed($userId, 'ticket_purchased', $eventId, $ticketTypeId, $metadata, $templateId);
+  return insertUserActivityFeed($userId, 'ticket_purchased', $eventId, $ticketId, $metadata);
 }
 
 function insertActivityAchievementUnlocked($userId, $achievementId, $metadata = null)
 {
-  return insertUserActivityFeed($userId, 'achievement_unlocked', $achievementId, null, $metadata, $templateId);
+  return insertUserActivityFeed($userId, 'achievement_unlocked', $achievementId, null, $metadata);
 }
 
 function getUserActivityFeed($config)
 {
   $limit = 50;
   $userId = $config["where"]["user_id"] ?? null;
-  $sql = "
-    SELECT af.*, at.template AS template_text,
+  $sql = "SELECT af.*,
+CASE WHEN ar_like.id IS NULL THEN 0 ELSE 1 END AS has_liked, 
+at.template AS template_text,
 CASE WHEN af.activity_type = 'user_followed' THEN af.reference_id_1 ELSE NULL END AS followed_user_id,
 CASE WHEN af.activity_type IN ('event_created', 'ticket_purchased') THEN e.title
      WHEN af.activity_type = 'event_reviewed' THEN e2.title
@@ -147,7 +153,9 @@ LEFT JOIN (
   FROM activity_comments
   WHERE is_visible = 1
   GROUP BY activity_id
-) cm ON cm.activity_id = af.id;
+) cm ON cm.activity_id = af.id
+LEFT JOIN activity_reactions ar_like ON ar_like.activity_id = af.id AND ar_like.user_id = 1527 AND ar_like.reaction_type = 'like';
+
   ";
   $params = [$userId];
   return executeSQL($sql, $params, ['reaction_breakdown', 'metadata']);

@@ -1,5 +1,7 @@
 <?php
 
+include_once __DIR__ . "/../activity/activity_functions.php";
+
 $eventsconfig = [
     "user" => [
         "tablename" => "users",
@@ -45,26 +47,6 @@ $eventsconfig = [
         "tablename" => "events",
         "key" => "id",
         "select" => "getEvents",
-        // [
-        //     "id",
-        //     "organizer_id",
-        //     "title",
-        //     "description",
-        //     "category",
-        //     "tags",
-        //     "location_name",
-        //     "location_latitude",
-        //     "location_longitude",
-        //     "start_datetime",
-        //     "end_datetime",
-        //     "max_attendees",
-        //     "status",
-        //     "images",
-        //     "videos",
-        //     "popularity_score",
-        //     "created_at",
-        //     "modified_at"
-        // ],
         "create" => [
             "organizer_id",
             "title",
@@ -98,6 +80,7 @@ $eventsconfig = [
             "popularity_score"
         ],
         "delete" => true,
+        "aftercreate" => "activityEventCreated",
         "subkeys" => [
             "ticket_types" => [
                 "tablename" => "ticket_types",
@@ -212,19 +195,35 @@ $eventsconfig = [
 ];
 
 
-function getEvents() {
+function getEvents($config, $id = null) {
     $sql = "SELECT 
-  e.*,
-  AVG(r.rating) AS popularity_score
-FROM 
-  events e
-JOIN 
-  organizers o ON e.organizer_id = o.user_id
-LEFT JOIN 
-  reviews r ON r.user_id = o.user_id
-GROUP BY 
-  e.id;";
+        e.*,
+        AVG(r.rating) AS popularity_score
+    FROM 
+        events e
+    JOIN 
+        organizers o ON e.organizer_id = o.user_id
+    LEFT JOIN 
+        reviews r ON r.user_id = o.user_id";
+    
+    if ($id !== null) {
+        $sql .= " WHERE e.id = " . intval($id);
+    }
+    
+    $sql .= " GROUP BY e.id;";
 
-  $result = executeSQL($sql);   
-  return $result;
+    $result = gapiExecuteSQL($sql);
+    return $result;
+}
+
+function activityEventCreated($config, $data, $new_record)
+{
+    $record = $new_record[0];
+    insertUserActivityFeed($record['organizer_id'], 'event_created', $record['id'], null, [
+        'title' => $record['title'],
+        'start_datetime' => $record['start_datetime'],
+        'end_datetime' => $record['end_datetime']
+    ]);
+    // Insert into user activity feed
+    return [$config, $data];
 }

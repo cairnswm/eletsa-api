@@ -4,7 +4,6 @@ include_once __DIR__ . '/tx.php';
 
 function createTransactions($order)
 {
-  var_dump("Creating transactions for order", $order);
   // Fetch all order items for the given order
   $orderItemsSql = "SELECT oi.id AS order_item_id, oi.price, t.id AS ticket_id, e.organizer_id, e.id as event_id, e.title as event_name 
                           FROM order_items oi 
@@ -13,8 +12,6 @@ function createTransactions($order)
                           WHERE oi.order_id = ?";
   $orderItems = executeQuery($orderItemsSql, [$order['id']]);
 
-  var_dump("ORDER", $order);
-  var_dump("ORDER ITEMS", $orderItems);
   foreach ($orderItems as $item) {
     createTransaction(
       "e671937d-54c9-11f0-9ec0-1a220d8ac2c9",

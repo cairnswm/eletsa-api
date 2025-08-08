@@ -1,6 +1,7 @@
 <?php
 include_once __DIR__ . '/config.php';
 include_once __DIR__ . '/processpayment.php';
+include_once __DIR__ . '/../activity/activity_functions.php';
 
 $params = [];
 

@@ -36,5 +36,5 @@ runAPI($config);
 function getOrders($config) {
     $userId = $config["where"]["user_id"];
     $sql = "SELECT id, promo_code_id, created_at, modified_at FROM orders WHERE user_id = ?";
-    return executeSQL($sql, [$userId]);
+    return gapiExecuteSQL($sql, [$userId]);
 }

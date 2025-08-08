@@ -1,0 +1,7 @@
+POST http://localhost/eletsa-api/php/follow/api.php/followers
+Content-Type: application/json
+
+{
+    "follower_user_id": 1530,
+    "followed_user_id": 1532
+}

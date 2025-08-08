@@ -1,0 +1,8 @@
+POST http://localhost/eletsa-api/php/activity/api.php/activityComment
+Accept: application/json
+
+{
+  "activity_id": 35,
+  "content": "This is a test reaction",
+  "user_id": 1530
+}

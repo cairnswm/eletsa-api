@@ -50,7 +50,7 @@ function getCart($config) {
         JOIN events e ON tt.event_id = e.id
         WHERE ci.user_id = ?
     ";
-    $result = executeSQL($sql, [$user_id]);
+    $result = gapiExecuteSQL($sql, [$user_id]);
     $items = $result;
 
     $sqlTotal = "
@@ -58,7 +58,7 @@ function getCart($config) {
         FROM cart_items ci
         WHERE ci.user_id = ?
     ";
-    $resultTotal = executeSQL($sqlTotal, [$user_id]);
+    $resultTotal = gapiExecuteSQL($sqlTotal, [$user_id]);
     $cart_total = 0;
     if (isset($resultTotal[0])) {
         $cart_total = $resultTotal[0]['cart_total'] ?? 0;
@@ -83,7 +83,7 @@ function cartToOrder() {
 
     // Fetch cart items for the user
     $cartItemsSql = "SELECT ticket_type_id, quantity, price FROM cart_items WHERE user_id = ?";
-    $cartItems = executeSQL($cartItemsSql, [$userId]);
+    $cartItems = gapiExecuteSQL($cartItemsSql, [$userId]);
 
     if (empty($cartItems)) {
         return ["error" => true, "message" => "Cart is empty"];
@@ -98,22 +98,22 @@ function cartToOrder() {
 
     // Create a new order
     $createOrderSql = "INSERT INTO orders (user_id, total_amount, final_amount, created_at, modified_at) VALUES (?, ?, ?, NOW(), NOW())";
-    executeSQL($createOrderSql, [$userId, $totalAmount, $finalAmount]);
+    gapiExecuteSQL($createOrderSql, [$userId, $totalAmount, $finalAmount]);
 
     // Get the newly created order ID
     $orderIdSql = "SELECT LAST_INSERT_ID() AS order_id";
-    $orderIdResult = executeSQL($orderIdSql);
+    $orderIdResult = gapiExecuteSQL($orderIdSql);
     $orderId = $orderIdResult[0]["order_id"];
 
     // Create order items from cart items
     foreach ($cartItems as $item) {
         $createOrderItemSql = "INSERT INTO order_items (order_id, ticket_type_id, quantity, price, created_at, modified_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
-        executeSQL($createOrderItemSql, [$orderId, $item["ticket_type_id"], $item["quantity"], $item["price"]]);
+        gapiExecuteSQL($createOrderItemSql, [$orderId, $item["ticket_type_id"], $item["quantity"], $item["price"]]);
     }
 
     // Clear the user's cart
     $clearCartSql = "DELETE FROM cart_items WHERE user_id = ?";
-    executeSQL($clearCartSql, [$userId]);
+    gapiExecuteSQL($clearCartSql, [$userId]);
 
     return ["success" => true, "message" => "Order created successfully", "order_id" => $orderId];
 }

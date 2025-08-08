@@ -1,0 +1,12 @@
+POST http://localhost/eletsa-api/php/events/api.php/event
+
+{
+  "title": "Sample Event",
+  "description": "This is a sample event description.",
+  "start_datetime": "2023-10-01 10:00:00",
+  "end_datetime": "2023-10-01 12:00:00",
+  "location": "Sample Location",
+  "organizer_id": 1532,
+  "category_id": 2,
+  "tags": ["sample", "event"]
+}

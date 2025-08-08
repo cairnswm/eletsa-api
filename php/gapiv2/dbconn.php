@@ -17,7 +17,7 @@ if ($gapiconn->connect_error) {
  * @param array $params The parameters to bind to the query
  * @return mysqli_stmt The executed statement object
  * */
-function executeSQL($sql, $params = [], $json = []) {
+function gapiExecuteSQL($sql, $params = [], $json = []) {
     global $gapiconn;
 
     $stmt = $gapiconn->prepare($sql);
