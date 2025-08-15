@@ -10,6 +10,12 @@ $ticketsconfig = [
         "create" => ["user_id", "event_id", "rating", "review"],
         "aftercreate" => "afterCreateReview"
     ],
+    "attendance" => [
+        "tablename" => "tickets",
+        "key" => "ticket_code",
+        "select" => ["ticket_code", "used"],
+        "update" => ["used"]
+    ],
     "post" => [
         "tickets" => "getTickets"
     ]

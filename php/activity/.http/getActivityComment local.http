@@ -1,0 +1,2 @@
+GET http://localhost/eletsa-api/php/activity/api.php/userActivityFeed/35/comments
+Accept: application/json

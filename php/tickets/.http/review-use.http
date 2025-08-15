@@ -1,0 +1,5 @@
+PUT http://localhost/eletsa-api/php/tickets/api.php/attendance/793c4d28-96bf-4953-b58b-b6280db99c6d
+
+{
+  "used": 1
+}

@@ -43,6 +43,11 @@ $eventsconfig = [
             ]
         ]
     ],
+    "scan" => [
+        "tablename" => "events",
+        "key" => "id",
+        "select" => "getEventByCode"
+    ],
     "event" => [
         "tablename" => "events",
         "key" => "id",
@@ -226,4 +231,30 @@ function activityEventCreated($config, $data, $new_record)
     ]);
     // Insert into user activity feed
     return [$config, $data];
+}
+
+function getEventByCode($config, $code)
+{
+    $sql = "SELECT 
+    e.id AS event_id,
+    e.title,
+    e.location_name,
+    e.location_latitude,
+    e.location_longitude,
+    e.start_datetime,
+    e.end_datetime,
+    e.category,
+    e.status,
+    COALESCE(SUM(t.quantity), 0) AS tickets_sold,
+    COALESCE(SUM(CASE WHEN t.used = 1 THEN t.quantity ELSE 0 END), 0) AS tickets_used
+FROM events e
+LEFT JOIN tickets t 
+    ON t.event_id = e.id
+WHERE e.code = ?
+GROUP BY 
+    e.id, e.title, e.location_name, e.location_latitude, e.location_longitude,
+    e.start_datetime, e.end_datetime, e.category, e.status;";
+
+    $result = gapiExecuteSQL($sql, [$code]);
+    return $result;
 }
