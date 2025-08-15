@@ -17,7 +17,8 @@ $ticketsconfig = [
         "update" => ["used"]
     ],
     "post" => [
-        "tickets" => "getTickets"
+        "tickets" => "getTickets",
+        "scan" => "markTicketUsed"
     ]
 ];
 
@@ -59,4 +60,55 @@ function afterCreateReview($config, $data, $new_record)
         'review' => $record['review']
     ]);
     return [$config, $data];
+}
+
+function markTicketUsed($config)
+{
+    $ticketCode = $config['ticket_code'] ?? null;
+    $eventCode = $config['event_code'] ?? null;
+
+    if (!$ticketCode || !$eventCode) {
+        return [$config, ['error' => 'Missing ticket_code or event_code']];
+    }
+
+    // Get event id from event code
+    $eventSql = "SELECT id FROM events WHERE code = ?";
+    $event = gapiExecuteSQL($eventSql, [$eventCode]);
+    if (!$event || count($event) === 0) {
+        return [$config, ['error' => 'Invalid event code']];
+    }
+    $eventId = $event[0]['id'];
+    $wasUsedAt = "";
+
+    // Fetch ticket info
+    $sql = "SELECT user_id, quantity, used, used_at FROM tickets WHERE ticket_code = ? AND event_id = ?";
+    $ticket = gapiExecuteSQL($sql, [$ticketCode, $eventId]);
+
+    if (!$ticket || count($ticket) === 0) {
+        return [$config, ['error' => 'Invalid ticket or event']];
+    }
+
+    $ticketInfo = $ticket[0];
+    $wasUsedBefore = $ticketInfo['used'];
+    if ($wasUsedBefore) {
+        $wasUsedAt = $ticketInfo["used_at"];
+    }
+
+
+    // Mark as used if not already
+    if (!$wasUsedBefore) {
+        $updateSql = "UPDATE tickets SET used = 1, used_at = NOW() WHERE ticket_code = ? AND event_id = ?";
+        gapiExecuteSQL($updateSql, [$ticketCode, $eventId]);
+    }
+
+    return [
+        [
+            'event_code' => $eventCode,
+            'ticket_code' => $ticketCode,
+            'user_id' => $ticketInfo['user_id'],
+            'quantity' => $ticketInfo['quantity'],
+            'was_used_before' => $wasUsedBefore,
+            'was_used_at' => $wasUsedAt
+        ]
+    ];
 }

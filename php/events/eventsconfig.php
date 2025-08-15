@@ -245,6 +245,7 @@ function getEventByCode($config, $code)
     e.end_datetime,
     e.category,
     e.status,
+    e.images,
     COALESCE(SUM(t.quantity), 0) AS tickets_sold,
     COALESCE(SUM(CASE WHEN t.used = 1 THEN t.quantity ELSE 0 END), 0) AS tickets_used
 FROM events e

@@ -1,0 +1,6 @@
+POST http://localhost/eletsa-api/php/tickets/api.php/scan
+
+{
+  "ticket_code": "793c4d28-96bf-4953-b58b-b6280db99c6d",
+  "event_code": "59bdf25b-5e5c-41c1-9b04-b1876c03f24e"
+}
