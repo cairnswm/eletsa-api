@@ -1,0 +1,11 @@
+POST https://localhost/eletsa-api/php/organizer/api.php/organizer
+
+{
+    "user_id": 1527,
+    "is_verified": false,
+    "payout_eligible": false,
+    "events_hosted": 0,
+    "tickets_sold": 0,
+    "positive_reviews": 0,
+    "quick_payout_eligibility": false
+}

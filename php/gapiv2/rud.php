@@ -73,8 +73,14 @@ function CreateData($config, $data)
 
         $stmt->close();
 
+        // Determine the value to use for fetching the new record
+        $fetch_id = $insert_id;
+        if ($config['key'] !== 'id' && isset($data[$config['key']])) {
+            $fetch_id = $data[$config['key']];
+        }
+
         // Fetch the new record
-        $new_record = SelectData($config, $insert_id);
+        $new_record = SelectData($config, $fetch_id);
     }
 
     // Execute after create function if it exists

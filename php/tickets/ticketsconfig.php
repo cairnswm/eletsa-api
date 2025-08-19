@@ -81,7 +81,7 @@ function markTicketUsed($config)
     $wasUsedAt = "";
 
     // Fetch ticket info
-    $sql = "SELECT user_id, quantity, used, used_at FROM tickets WHERE ticket_code = ? AND event_id = ?";
+    $sql = "SELECT id, user_id, quantity, used, used_at FROM tickets WHERE ticket_code = ? AND event_id = ?";
     $ticket = gapiExecuteSQL($sql, [$ticketCode, $eventId]);
 
     if (!$ticket || count($ticket) === 0) {
@@ -90,7 +90,8 @@ function markTicketUsed($config)
 
     $ticketInfo = $ticket[0];
     $wasUsedBefore = $ticketInfo['used'];
-    if ($wasUsedBefore) {
+    if ($wasUsedBefore == 1) {
+        var_dump($ticketInfo);
         $wasUsedAt = $ticketInfo["used_at"];
     }
 
