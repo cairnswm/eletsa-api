@@ -91,7 +91,6 @@ function markTicketUsed($config)
     $ticketInfo = $ticket[0];
     $wasUsedBefore = $ticketInfo['used'];
     if ($wasUsedBefore == 1) {
-        var_dump($ticketInfo);
         $wasUsedAt = $ticketInfo["used_at"];
     }
 
